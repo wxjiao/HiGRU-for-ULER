@@ -109,8 +109,14 @@ def comput_class_loss(log_prob, target, weights):
 def loss_weight(tr_ladict, ladict, focus_dict, rate=1.0):
 	""" Loss weights """
 	min_emo = float(min([tr_ladict.word2count[w] for w in focus_dict]))
-	weight = [math.pow(min_emo / tr_ladict.word2count[k], rate) if k in focus_dict
-	          else 0 for k,v in ladict.word2count.items()]
+	
+	weight = [0] * len(ladict.word2count.keys())
+	for k, v in ladict.word2count.items():
+		if k in focus_dict:
+			weight[ladict.word2index[k]] = math.pow(min_emo / tr_ladict.word2count[k], rate)
+		else:
+			weight[ladict.word2index[k]] = 0
+	
 	weight = np.array(weight)
 	weight /= np.sum(weight)
 
